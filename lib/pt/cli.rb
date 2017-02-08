@@ -31,7 +31,7 @@ module PT
       end
     end
 
-    %w[show tasks open assign comments label estimate start finish deliver accept reject done].each do |action|
+    ACTION.each do |action|
       desc "#{action} [id]", "#{action} story"
       define_method(action.to_sym) do |story_id = nil|
         if story_id
@@ -60,7 +60,6 @@ module PT
       story = select_story_from_paginated_table do |page|
         @client.get_stories(filter: "owner:#{@local_config[:user_name]} -state:accepted", page: page)
       end
-      show_story(story)
     end
 
     desc "list [owner]", "list all stories from owner"
@@ -128,7 +127,6 @@ module PT
         else
           owner = nil
         end
-        requester = @local_config[:user_name]
         type = ask('Type? (c)hore, (b)ug, anything else for feature)')
       end
 

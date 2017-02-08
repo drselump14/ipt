@@ -3,6 +3,7 @@ module PT
 
     GLOBAL_CONFIG_PATH = ENV['HOME'] + "/.pt"
     LOCAL_CONFIG_PATH = Dir.pwd + '/.pt'
+    ACTION = %w[show open assign estimate start finish deliver accept reject done tasks comment label ]
 
     def load_global_config
 
@@ -116,17 +117,15 @@ module PT
       if table.length > 0
         begin
           table.print @global_config
-          row = ask "#{msg} (1-#{table.length}, 'n' to fetch next data, 'p' to fetch previous data, 'q' to exit)"
-          case row
-          when 'q'
+          row = ask "#{msg} (1-#{table.length}, 'q' to exit)"
+          if row == 'q'
             quit
-          when 'n'
-            return 'n'
-          when 'p'
-            return 'p'
+          elsif row.to_i > 0
+            selected = table[row]
+            error "Invalid selection, try again:" unless selected
+          elsif %w[n p q].include?(row)
+            return row
           end
-          selected = table[row]
-          error "Invalid selection, try again:" unless selected
         end until selected
         selected
       else
@@ -257,14 +256,35 @@ module PT
       begin
         stories = block.call(page)
         table = TasksTable.new(stories)
+        say ""
+        say '========================================================================================='.green
+        say "HELP: [number]: select story | [n]:fetch next data | [p]:fetch previous data | [q]: quit".green
+        say '========================================================================================='.green
         story = select(prompt, table)
         if story == 'n'
           page+=1
         elsif story == 'p'
           page-=1
+        elsif story == 'q'
+          quit
+        elsif story.kind_of?(TrackerApi::Resources::Story)
+          say "Action for >> '#{story.name.green}'[#{story.story_type}]"
+          choose_action(story)
+        else
+          error "Invalid selection, try again:"
         end
-      end while story.kind_of?(String)
-      story
+      end while true
+    end
+
+    def choose_action(story)
+      @io.choose do |menu|
+        menu.prompt = "Please choose action"
+        ACTION.each do |action|
+          menu.choice(action.to_sym) { send("#{action}_story", story) }
+        end
+        menu.choice(:back) { say('back to table ....') }
+        menu.choice(:quit) { quit }
+      end
     end
   end
 end

@@ -45,19 +45,15 @@ module PT
     end
 
     def assign_story story
-      if (owner = find_owner @params[1])
-        @client.assign_task(story, owner)
-      else
-        members = @client.get_members
-        table = PersonsTable.new(members.map(&:person))
-        owner = select("Please select a member to assign him the story", table)
-      end
+      members = @client.get_members
+      table = PersonsTable.new(members.map(&:person))
+      owner = select("Please select a member to assign him the story", table)
 
       congrats("story assigned to #{owner.initials}, thanks!")
     end
 
     def comment_story(story)
-      comment = @params[1] || ask("Write your comment")
+      comment = ask("Write your comment")
       if @client.comment_task(story, comment)
         congrats("Comment sent, thanks!")
         save_recent_task( story.id )
@@ -67,12 +63,7 @@ module PT
     end
 
     def label_story(story)
-      if @params[1]
-        label = @params[1]
-      else
-        label = ask("Which label?")
-      end
-
+      label = ask("Which label?")
       @client.add_label(story, label );
       show_story(task_by_id_or_pt_id(story.id))
     end
@@ -109,7 +100,7 @@ module PT
     end
 
     def reject_story(story)
-      comment = @params[1] || ask("Please explain why are you rejecting the story.")
+      comment = ask("Please explain why are you rejecting the story.")
       if @client.comment_task(story, comment)
         @client.mark_task_as(story, 'rejected')
         congrats("story rejected, thanks!")
@@ -121,23 +112,6 @@ module PT
     def done_story(story)
       #we need this for finding again later
       story_id = story.id
-
-      if !@params[1] && story.estimate == -1
-        error("You need to give an estimate for this task")
-        return
-      end
-
-      if @params[1] && story.estimate == -1
-        if [0,1,2,3].include? @params[1].to_i
-          estimate_story(story, @params[1].to_i)
-        end
-        if @params[2]
-          story = task_by_id_or_pt_id story_id
-          @client.comment_task(story, @params[2])
-        end
-      else
-        @client.comment_task(story, @params[1]) if @params[1]
-      end
 
       start_story story
 
