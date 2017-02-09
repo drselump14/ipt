@@ -27,6 +27,16 @@ module PT
         message text
       end
       save_recent_task( story.id )
+      say '---------------------------------------------------------'.magenta
+      choice = ask "Please choose action ([b]:back to table | [m]:show menu | [q] quit)"
+      case choice
+      when 'q'
+        quit
+      when 'm'
+        choose_action(story)
+      when 'b'
+        say('back to table ....')
+      end
     end
 
     def tasks_story(story)
@@ -110,9 +120,6 @@ module PT
     end
 
     def done_story(story)
-      #we need this for finding again later
-      story_id = story.id
-
       start_story story
 
       finish_story story
