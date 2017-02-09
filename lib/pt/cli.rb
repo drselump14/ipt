@@ -1,9 +1,19 @@
 require 'yaml'
-require 'colored'
 require 'highline'
 require 'tempfile'
 require 'uri'
 require 'thor'
+require 'paint'
+
+# String patch monkey
+class String
+  %i[blue yellow green red white black magenta cyan bold].each do |color|
+    define_method(color) do
+      Paint[self, color]
+    end
+  end
+end
+
 module PT
   class CLI < Thor
     include PT::Action

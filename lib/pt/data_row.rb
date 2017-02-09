@@ -30,5 +30,46 @@ module PT
       @n.to_s
     end
 
+    def name
+      _name = @record.name
+      if _name.size > 15
+        _name[0..15] + '...'
+      else
+        _name
+      end
+    end
+
+    def state
+      state = @record.current_state
+      case state
+      when 'delivered'
+        state.yellow
+      when 'finished'
+        state.blue
+      when 'accepted'
+        state.green
+      when 'rejected'
+        state.red
+      when 'started'
+        state.white
+      else
+        state.black
+      end
+    end
+
+    def story_type
+      t = @record.story_type
+      case t
+      when 'bug'
+        t.red
+      when 'feature'
+        t.yellow
+      when 'release'
+        t.green
+      else
+        t.white
+      end
+    end
+
   end
 end

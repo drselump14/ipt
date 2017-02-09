@@ -28,10 +28,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'vcr'
   spec.add_development_dependency 'fakeweb'
 
-  spec.add_dependency    'hirb', '~> 0.7', '>= 0.7.3'
-  spec.add_dependency    'hirb-unicode', '~> 0.0.5', '>= 0.0.5'
-  spec.add_dependency    'colored', '~> 1.2'
   spec.add_dependency    'highline'
   spec.add_dependency    'tracker_api', '~> 1.6.0'
   spec.add_dependency    'thor'
+  spec.add_dependency    'terminal-table'
+  spec.add_dependency    'paint'
 end

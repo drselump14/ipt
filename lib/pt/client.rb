@@ -106,7 +106,7 @@ module PT
     end
 
     def get_stories(params={})
-      limit = config[:limit] || 20
+      limit = config[:limit] || 10
       page = params[:page] || 0
       offset = page*limit
       filter = params[:filter] || '-state=accepted'

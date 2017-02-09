@@ -1,13 +1,15 @@
-require 'hirb'
-require 'hirb-unicode'
+# require 'hirb'
+# require 'hirb-unicode'
+require 'terminal-table'
 
 module PT
 
   class DataTable
 
-    extend ::Hirb::Console
+    # extend ::Hirb::Console
 
-    def initialize(dataset)
+    def initialize(dataset, title=nil)
+      @title = title
       @rows = dataset.map{ |row| DataRow.new(row, dataset) }
     end
 
@@ -16,18 +18,26 @@ module PT
         puts "\n#{'-- empty list --'.center(36)}\n"
       else
 
-        max_width = Hirb::Util.detect_terminal_size()[0]
-        if config[:max_width] && config[:max_width] < max_width
-          max_width = config[:max_width]
-        end
+        # max_width = Hirb::Util.detect_terminal_size()[0]
+        # if config[:max_width] && config[:max_width] < max_width
+        #   max_width = config[:max_width]
+        # end
         headers = [:num]
-
         headers += self.class.headers.present? ? self.class.headers : self.class.fields
 
-        self.class.table @rows, :fields => [:num] + self.class.fields,
-             :change_fields => %w{num pt_id},
-             :unicode => true, :description => false,
-             :max_width => max_width
+        # self.class.table @rows, :fields => [:num] + self.class.fields,
+        #      :change_fields => %w{num pt_id},
+        #      :unicode => true, :description => false,
+        #      :max_width => max_width
+        fields = [:num] + self.class.fields
+        rows = []
+        @rows.each_with_index do |row, index|
+          _row = fields.map { |f| row.send(f) }
+          rows << _row
+        end
+        table = Terminal::Table.new(title: @title, headings: headers,
+                                   rows: rows, style: { all_separators: true })
+        puts table
       end
     end
 
