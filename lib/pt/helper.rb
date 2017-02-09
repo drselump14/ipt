@@ -3,7 +3,7 @@ module PT
 
     GLOBAL_CONFIG_PATH = ENV['HOME'] + "/.pt"
     LOCAL_CONFIG_PATH = Dir.pwd + '/.pt'
-    ACTION = %w[show open assign estimate start finish deliver accept reject done tasks comment label ]
+    ACTION = %w[show open start finish deliver accept reject done assign estimate tasks comment label ]
 
     def load_global_config
 
@@ -117,7 +117,7 @@ module PT
       if table.length > 0
         begin
           table.print @global_config
-          row = ask "#{msg} (1-#{table.length}, 'q' to exit)"
+          row = ask "#{msg} (1-#{table.length}, 'q' to exit)".magenta
           if row == 'q'
             quit
           elsif row.to_i > 0
@@ -278,12 +278,13 @@ module PT
 
     def choose_action(story)
       @io.choose do |menu|
-        menu.prompt = "Please choose action"
+        menu.prompt = "Please choose action ( [number/name/first letter]:select action | [Enter]:show story )".magenta
         ACTION.each do |action|
           menu.choice(action.to_sym) { send("#{action}_story", story) }
         end
         menu.choice(:back) { say('back to table ....') }
         menu.choice(:quit) { quit }
+        menu.default = :show
       end
     end
   end
