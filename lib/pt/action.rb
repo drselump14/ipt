@@ -1,6 +1,7 @@
 module PT
   module Action
     def show_story(story)
+      clear
       title('========================================='.red)
       title story.name.red
       title('========================================='.red)
@@ -127,6 +128,15 @@ module PT
       deliver_story story
     end
 
+    def copy_story_id(story)
+      `echo #{story.id} | pbcopy`
+      congrats("Story ID copied")
+    end
+
+    def copy_story_url(story)
+      `echo #{story.url} | pbcopy`
+      congrats("Story URL copied")
+    end
   end
 end
 

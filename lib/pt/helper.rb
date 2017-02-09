@@ -113,28 +113,6 @@ module PT
       puts "\n#{split_lines(msg).red.bold}"
     end
 
-    def select(msg, table)
-      if table.length > 0
-        begin
-          table.print @global_config
-          row = ask "#{msg} (1-#{table.length}, 'q' to exit)".magenta
-          if row == 'q'
-            quit
-          elsif row.to_i > 0
-            selected = table[row]
-            error "Invalid selection, try again:" unless selected
-          elsif %w[n p q].include?(row)
-            return row
-          end
-        end until selected
-        selected
-      else
-        table.print @global_config
-        message "Sorry, there are no options to select."
-        quit
-      end
-    end
-
     def quit
       message "bye!"
       exit
@@ -237,6 +215,10 @@ module PT
       task.save
     end
 
+    def clear
+      puts "\e[H\e[2J"
+    end
+
     def save_recent_task( task_id )
       # save list of recently accessed tasks
       unless (@local_config[:recent_tasks])
@@ -250,26 +232,53 @@ module PT
       save_config( @local_config, get_local_config_path() )
     end
 
+    def select(msg, table)
+      if table.length > 0
+        begin
+          table.print @global_config
+          row = ask "#{msg} (1-#{table.length}, 'q' to exit)".magenta
+          if row == 'q'
+            quit
+          elsif row.to_i > 0
+            selected = table[row]
+            error "Invalid selection, try again:" unless selected
+          elsif %w[n p q].include?(row)
+            return row
+          end
+        end until selected
+        selected
+      else
+        table.print @global_config
+        error "Sorry, there are no options to select."
+        return 'EOF'
+      end
+    end
+
     def select_story_from_paginated_table(&block)
       prompt = "Please select a story"
       page = 0
       begin
         stories = block.call(page)
         table = TasksTable.new(stories)
+        clear
         say ""
         say '========================================================================================='.green
         say "HELP: [number]: select story | [n]:fetch next data | [p]:fetch previous data | [q]: quit".green
         say '========================================================================================='.green
         story = select(prompt, table)
         if story == 'n'
+          old_page = page
           page+=1
         elsif story == 'p'
+          old_page = page
           page-=1
         elsif story == 'q'
           quit
         elsif story.kind_of?(TrackerApi::Resources::Story)
           say "Action for >> '#{story.name.green}'[#{story.story_type}]"
           choose_action(story)
+        elsif story == 'EOF'
+          page = old_page
         else
           error "Invalid selection, try again:"
         end
@@ -282,6 +291,8 @@ module PT
         ACTION.each do |action|
           menu.choice(action.to_sym) { send("#{action}_story", story) }
         end
+        menu.choice('id (copy story id)') { copy_story_id(story)}
+        menu.choice('url (copy story url)') { copy_story_url(story) }
         menu.choice(:back) { say('back to table ....') }
         menu.choice(:quit) { quit }
         menu.default = :show
