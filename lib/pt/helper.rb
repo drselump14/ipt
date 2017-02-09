@@ -261,9 +261,9 @@ module PT
         stories = block.call(page)
         table = TasksTable.new(stories)
         clear
-        say ""
+        say "Pivotal Tracker Command Line v#{PT::VERSION}".magenta
         say '========================================================================================='.green
-        say "HELP: [number]: select story | [n]:fetch next data | [p]:fetch previous data | [q]: quit".green
+        say "[number]: select story | [n]:next data | [p]:previous data | [c]:create story | [r]:refresh | [q]: quit".green
         say '========================================================================================='.green
         story = select(prompt, table)
         if story == 'n'
@@ -274,6 +274,8 @@ module PT
           page-=1
         elsif story == 'q'
           quit
+        elsif story == 'c'
+          create_story({})
         elsif story.kind_of?(TrackerApi::Resources::Story)
           say "Action for >> '#{story.name.green}'[#{story.story_type}]"
           choose_action(story)
@@ -288,7 +290,13 @@ module PT
     def choose_action(story)
       @io.choose do |menu|
         menu.prompt = "Please choose action ( [number/name/first letter]:select action | [Enter]:show story )".magenta
-        ACTION.each do |action|
+        menu.choice(:view, 'View details of story','View') { show_story(story) }
+        menu.choice(:start, nil,'start'.white) { start_story(story) }
+        menu.choice(:finish, nil,'finish'.blue) { finish_story(story) }
+        menu.choice(:deliver, nil,'deliver'.yellow) { deliver_story(story) }
+        menu.choice(:accept, nil,'accept'.green) { accept_story(story) }
+        menu.choice(:reject, nil,'reject'.red) { reject_story(story) }
+        ACTION.reject!{|a| %w[show finish deliver accept reject].include?(a)}.each do |action|
           menu.choice(action.to_sym) { send("#{action}_story", story) }
         end
         menu.choice('id (copy story id)') { copy_story_id(story)}

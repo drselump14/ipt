@@ -73,11 +73,11 @@ module PT
   class TasksTable < DataTable
 
     def self.fields
-      [:name, :owners, :story_type, :estimate, :state, :id]
+      [:name, :owners, :story_type, :estimate, :state]
     end
 
     def self.headers
-      [:name, :owners, :type, :point, :state, :id]
+      [:title, :owners, :type, :pt, :state]
     end
 
   end

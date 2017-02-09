@@ -61,13 +61,16 @@ module PT
       t = @record.story_type
       case t
       when 'bug'
-        t.red
+        # t.red
+        "🐞"
       when 'feature'
-        t.yellow
+        "⭐"
       when 'release'
-        t.green
+        '🏁'
+      when 'chore'
+        '⚙'
       else
-        t.white
+        t
       end
     end
 

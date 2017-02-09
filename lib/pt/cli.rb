@@ -115,59 +115,26 @@ module PT
     option :owner, aliases: :o
     option :m, type: :boolean
     def create(title =nil)
-      owner = options[:owner]
-      type = options[:type]
-      requester_id = @local_config[:user_id]
       if title
-        name = title
-        owner = owner || @local_config[:user_name]
-        type = task_type_or_nil(owner) || task_type_or_nil(type) || 'feature'
+        owner_id = if options[:owner] && (owner = @client.find_member(options[:owner]))
+                     owner.person.id
+                   else
+                     nil
+                   end
+        description = edit_using_editor if options[:m]
+        params = {
+          name: title,
+          requested_by_id: @local_config[:user_id],
+          owner_ids: [owner_id],
+          description: description
+        }
+        params[:story_type] = options[:type] if options[:type]
+
+        story = @client.create_story(params)
+        congrats("Story has been created \n #{story.url}")
       else
-        title("Let's create a new task:")
-        name = ask("Name for the new task:")
+        create_interactive_story(requested_by_id: @local_config[:user_id])
       end
-
-      owner = @client.find_member(owner).person.id if owner.kind_of?(String)
-
-      unless owner
-        if ask('Do you want to assign it now? (y/n)').downcase == 'y'
-          members = @client.get_members
-          table = PersonsTable.new(members.map(&:person))
-          owner = select("Please select a member to assign him the task.", table).id
-        else
-          owner = nil
-        end
-        type = ask('Type? (c)hore, (b)ug, anything else for feature)')
-      end
-
-      type = case type
-             when 'c', 'chore'
-               'chore'
-             when 'b', 'bug'
-               'bug'
-             else
-               'feature'
-             end
-
-      owner_ids = [owner]
-      # did you do a -m so you can add a description?
-      if options[:m]
-        editor = ENV.fetch('EDITOR') { 'vi' }
-        temp_path = "/tmp/editor-#{ Process.pid }.txt"
-        system "#{ editor } #{ temp_path }"
-
-        description = File.read(temp_path)
-      end
-
-      story = @client.create_story(
-        name: name,
-        owner_ids: owner_ids,
-        requested_by_id: requester_id,
-        story_type: type,
-        description: description
-      )
-      congrats("#{type} for #{owner} open #{story.url}")
-      show_story(story)
     end
 
     desc "find [query] " ,"looks in your stories by title and presents it"

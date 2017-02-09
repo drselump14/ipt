@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'vcr'
   spec.add_development_dependency 'fakeweb'
 
-  spec.add_dependency    'highline'
+  spec.add_dependency    'highline', '>= 2.0.0.pre.develop.6'
   spec.add_dependency    'tracker_api', '~> 1.6.0'
   spec.add_dependency    'thor'
   spec.add_dependency    'terminal-table'

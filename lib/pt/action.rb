@@ -137,6 +137,47 @@ module PT
       `echo #{story.url} | pbcopy`
       congrats("Story URL copied")
     end
+
+    def create_interactive_story(options={})
+      # set title
+      title = ask("Name for the new task:")
+
+      # set owner
+      if ask('Do you want to assign it now? (y/n)').downcase == 'y'
+        members = @client.get_members
+        table = PersonsTable.new(members.map(&:person))
+        owner = select("Please select a member to assign him the task.", table)
+        owner_id = owner.id
+      end
+
+      # set story type
+      type = case ask('Type? (c)hore, (b)ug, anything else for feature)')
+             when 'c', 'chore'
+               'chore'
+             when 'b', 'bug'
+               'bug'
+             else
+               'feature'
+             end
+
+      description = edit_using_editor if ask('Do you want to write description now?(y/n)') == 'y'
+      story = @client.create_story(
+        name: title,
+        owner_ids: [owner_id],
+        requested_by_id: options[:requested_by_id],
+        story_type: type,
+        description: description
+      )
+      congrats("#{type} for #{owner.name} has been created \n #{story.url}")
+      story
+    end
+
+    def edit_using_editor
+      editor = ENV.fetch('EDITOR') { 'vi' }
+      temp_path = "/tmp/editor-#{ Process.pid }.txt"
+      system "#{ editor } #{ temp_path }"
+      File.read(temp_path)
+    end
   end
 end
 
