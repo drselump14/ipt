@@ -242,7 +242,7 @@ module PT
           elsif row.to_i > 0
             selected = table[row]
             error "Invalid selection, try again:" unless selected
-          elsif %w[n p q].include?(row)
+          elsif %w[n p q c r].include?(row)
             return row
           end
         end until selected
@@ -275,11 +275,12 @@ module PT
         elsif story == 'q'
           quit
         elsif story == 'c'
-          create_story({})
+          say 'you choose create'
+          create_interactive_story(requested_by_id: @local_config[:user_id])
         elsif story.kind_of?(TrackerApi::Resources::Story)
           say "Action for >> '#{story.name.green}'[#{story.story_type}]"
           choose_action(story)
-        elsif story == 'EOF'
+        elsif story == 'EOF' || story == 'r'
           page = old_page
         else
           error "Invalid selection, try again:"
@@ -288,22 +289,22 @@ module PT
     end
 
     def choose_action(story)
-      @io.choose do |menu|
+      HighLine.new.choose do |menu|
         menu.prompt = "Please choose action ( [number/name/first letter]:select action | [Enter]:show story )".magenta
-        menu.choice(:view, 'View details of story','View') { show_story(story) }
+        menu.choice(:view, 'View details of story','view') { show_story(story) }
         menu.choice(:start, nil,'start'.white) { start_story(story) }
         menu.choice(:finish, nil,'finish'.blue) { finish_story(story) }
         menu.choice(:deliver, nil,'deliver'.yellow) { deliver_story(story) }
         menu.choice(:accept, nil,'accept'.green) { accept_story(story) }
         menu.choice(:reject, nil,'reject'.red) { reject_story(story) }
-        ACTION.reject!{|a| %w[show finish deliver accept reject].include?(a)}.each do |action|
+        %w[assign estimate tasks comment label].each do |action|
           menu.choice(action.to_sym) { send("#{action}_story", story) }
         end
         menu.choice('id (copy story id)') { copy_story_id(story)}
         menu.choice('url (copy story url)') { copy_story_url(story) }
         menu.choice(:back) { say('back to table ....') }
         menu.choice(:quit) { quit }
-        menu.default = :show
+        menu.default = :view
       end
     end
   end

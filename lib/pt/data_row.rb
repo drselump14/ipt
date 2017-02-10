@@ -74,5 +74,9 @@ module PT
       end
     end
 
+    def estimate
+      @record.estimate.to_i if @record.estimate
+    end
+
   end
 end

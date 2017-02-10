@@ -168,7 +168,7 @@ module PT
         story_type: type,
         description: description
       )
-      congrats("#{type} for #{owner.name} has been created \n #{story.url}")
+      congrats("#{type} #{('for' + owner.name ) if owner} has been created \n #{story.url}")
       story
     end
 
