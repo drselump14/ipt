@@ -131,24 +131,21 @@ module PT
 
 
     def mark_task_as(task, state)
-      task = get_story(task.id)
       task.current_state = state
       task.save
     end
 
     def estimate_story(task, points)
-      task = get_story(task.id)
       task.estimate = points
       task.save
     end
 
-    def assign_task(task, owner)
-      task = get_story(task.id)
-      task.add_owner(owner)
+    def assign_story(story, owner)
+      story.add_owner(owner)
+      story.save
     end
 
     def add_label(task, label)
-      task = get_story(task.id)
       task.add_label(label)
       task.save
     end

@@ -254,12 +254,13 @@ module PT
       end
     end
 
-    def select_story_from_paginated_table(&block)
+    def select_story_from_paginated_table(options={}, &block)
       prompt = "Please select a story"
       page = 0
       begin
         stories = block.call(page)
-        table = TasksTable.new(stories)
+        title = (options[:title] || 'Stories').to_s + " [Page #{page+1}]"
+        table = TasksTable.new(stories, title)
         clear
         say "Pivotal Tracker Command Line v#{PT::VERSION}".magenta
         say '========================================================================================='.green
@@ -275,11 +276,10 @@ module PT
         elsif story == 'q'
           quit
         elsif story == 'c'
-          say 'you choose create'
           create_interactive_story(requested_by_id: @local_config[:user_id])
         elsif story.kind_of?(TrackerApi::Resources::Story)
           say "Action for >> '#{story.name.green}'[#{story.story_type}]"
-          choose_action(story)
+          options[:default_action] ? send("#{options[:default_action]}_story", story) : choose_action(story)
         elsif story == 'EOF' || story == 'r'
           page = old_page
         else
@@ -288,9 +288,15 @@ module PT
       end while true
     end
 
+    def choose_person
+      members = @client.get_members
+      table = PersonsTable.new(members.map(&:person))
+      select("Please select a member to see his tasks.", table)
+    end
+
     def choose_action(story)
       HighLine.new.choose do |menu|
-        menu.prompt = "Please choose action ( [number/name/first letter]:select action | [Enter]:show story )".magenta
+        menu.prompt = "Please choose action ( [number/name]:select action | [Enter]:show story )".magenta
         menu.choice(:view, 'View details of story','view') { show_story(story) }
         menu.choice(:start, nil,'start'.white) { start_story(story) }
         menu.choice(:finish, nil,'finish'.blue) { finish_story(story) }

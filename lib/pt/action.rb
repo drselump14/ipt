@@ -56,10 +56,8 @@ module PT
     end
 
     def assign_story story
-      members = @client.get_members
-      table = PersonsTable.new(members.map(&:person))
-      owner = select("Please select a member to assign him the story", table)
-
+      owner = choose_person
+      @client.assign_story(story, owner)
       congrats("story assigned to #{owner.initials}, thanks!")
     end
 
@@ -76,7 +74,7 @@ module PT
     def label_story(story)
       label = ask("Which label?")
       @client.add_label(story, label );
-      show_story(task_by_id_or_pt_id(story.id))
+      congrats("#{label} added, thanks!")
     end
 
     def estimate_story(story)
