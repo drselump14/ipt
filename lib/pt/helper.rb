@@ -257,33 +257,40 @@ module PT
     def select_story_from_paginated_table(options={}, &block)
       prompt = "Please select a story"
       page = 0
+      no_request = false
       begin
-        stories = block.call(page)
-        title = (options[:title] || 'Stories').to_s + " [Page #{page+1}]"
+        say('Please wait...')
+        stories = block.call(page) unless no_request
+        title = (options[:title] || 'Stories').to_s + " [#{@client.current_page}/#{@client.total_page}]"
         table = TasksTable.new(stories, title)
         clear
         say "Pivotal Tracker Command Line v#{PT::VERSION}".magenta
         say '========================================================================================='.green
         say "[number]: select story | [n]:next data | [p]:previous data | [c]:create story | [r]:refresh | [q]: quit".green
         say '========================================================================================='.green
-        story = select(prompt, table)
-        if story == 'n'
-          old_page = page
-          page+=1
-        elsif story == 'p'
-          old_page = page
-          page-=1
-        elsif story == 'q'
-          quit
-        elsif story == 'c'
-          create_interactive_story(requested_by_id: @local_config[:user_id])
-        elsif story.kind_of?(TrackerApi::Resources::Story)
+        case story = select(prompt, table)
+        when TrackerApi::Resources::Story
           say "Action for >> '#{story.name.green}'[#{story.story_type}]"
-          options[:default_action] ? send("#{options[:default_action]}_story", story) : choose_action(story)
-        elsif story == 'EOF' || story == 'r'
-          page = old_page
+          action = (options[:default_action] ? send("#{options[:default_action]}_story", story) : choose_action(story))
+          no_request = action == :no_request
+        when String
+          if story == 'n'
+            old_page = page
+            page+=1
+          elsif story == 'p'
+            old_page = page
+            page-=1
+          elsif story == 'q'
+            quit
+          elsif story == 'c'
+            create_interactive_story(requested_by_id: @local_config[:user_id])
+          elsif story == 'EOF' || story == 'r'
+            page = old_page
+          end
+          no_request = false
         else
           error "Invalid selection, try again:"
+          no_request = true
         end
       end while true
     end

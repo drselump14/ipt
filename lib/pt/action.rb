@@ -9,26 +9,30 @@ module PT
       requester = story.requested_by ? story.requested_by.initials : @local_config[:user_name]
       message "#{story.current_state.capitalize} #{story.story_type} | #{estimation} | Req: #{requester} | Owners: #{story.owners.map(&:initials).join(',')} | ID: #{story.id}"
 
-      if story.labels.present?
+      if story.instance_variable_get(:@labels).present?
         message "Labels: " + story.labels.map(&:name).join(', ')
       end
+
       message story.description.green unless story.description.nil? || story.description.empty?
       message "View on pivotal: #{story.url}"
 
-      if story.tasks.present?
+      if story.instance_variable_get(:@tasks).present?
         title('tasks'.yellow)
         story.tasks.each{ |t| compact_message "- #{t.complete ? "[done]" : ""} #{t.description}" }
       end
 
 
-      story.comments.each do |n|
-        title('......................................'.blue)
-        text = ">> #{n.person.initials}: #{n.text}"
-        text << "[#{n.file_attachment_ids.size}F]" if n.file_attachment_ids
-        message text
+      if story.instance_variable_get(:@comments).present?
+        story.comments.each do |n|
+          title('......................................'.blue)
+          text = ">> #{n.person.initials}: #{n.text}"
+          text << "[#{n.file_attachment_ids.size}F]" if n.file_attachment_ids
+          message text
+        end
       end
       save_recent_task( story.id )
-      say '---------------------------------------------------------'.magenta
+      say ""
+      title '================================================='.red
       choice = ask "Please choose action ([b]:back to table | [m]:show menu | [q] quit)"
       case choice
       when 'q'
@@ -37,6 +41,7 @@ module PT
         choose_action(story)
       when 'b'
         say('back to table ....')
+        return :no_request
       end
     end
 

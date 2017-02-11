@@ -5,9 +5,9 @@ require 'tracker_api'
 module PT
   class Client
 
-    STORY_FIELDS=':default,requested_by,owners,tasks,comments(:default,person,file_attachments)'
+    STORY_FIELDS=':default,requested_by(initials),owners(initials),tasks(complete,description),comments(text,file_attachment_ids,person(initials))'
 
-    attr_reader :config, :project
+    attr_reader :config, :project, :client, :total_record, :limit
 
     def self.get_api_token(email, password)
       PivotalAPI::Me.retrieve(email, password)
@@ -19,6 +19,17 @@ module PT
       @client = TrackerApi::Client.new(token: token)
       @config = local_config
       @project = @client.project(local_config[:project_id]) if local_config
+      @limit = config[:limit] || 10
+    end
+
+    def total_page
+      @total_record = @client.last_response.env.response_headers["X-Tracker-Pagination-Total"]
+      (@total_record.to_f/limit).ceil
+    end
+
+    def current_page
+       offset = @client.last_response.env.response_headers["X-Tracker-Pagination-Offset"]
+       ((offset.to_f/limit)+1).to_i
     end
 
     def get_project(project_id)

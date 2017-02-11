@@ -71,7 +71,7 @@ module PT
     TYPE.each do |type|
       desc "#{type} <owner>", "show all #{type} stories"
       define_method(type.to_sym) do  |owner = nil|
-        filter =  "story_type:#{type}"
+        filter =  "story_type:#{type} -state:accepted"
         filter << " owner:#{owner}" if owner
         select_story_from_paginated_table(title: "#{type} stories") do |page|
           @client.get_stories(filter: filter, page: page)
