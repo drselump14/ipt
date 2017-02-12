@@ -119,7 +119,7 @@ module PT
     end
 
     def ask(msg)
-      @io.ask("#{msg.bold}")
+      @io.ask(msg)
     end
 
     def ask_secret(msg)
@@ -315,7 +315,7 @@ module PT
         end
         menu.choice('id (copy story id)') { copy_story_id(story)}
         menu.choice('url (copy story url)') { copy_story_url(story) }
-        menu.choice(:back) { say('back to table ....') }
+        menu.choice(:back) { say('back to table ....'); return :no_request }
         menu.choice(:quit) { quit }
         menu.default = :view
       end

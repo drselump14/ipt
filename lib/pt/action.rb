@@ -89,6 +89,9 @@ module PT
     end
 
     def start_story story
+      unless story.estimate
+        estimate_story(story)
+      end
       @client.mark_task_as(story, 'started')
       congrats("story started, go for it!")
     end
