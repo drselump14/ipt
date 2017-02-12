@@ -285,7 +285,7 @@ module PT
           elsif story == 'c'
             create_interactive_story(requested_by_id: @local_config[:user_id])
           elsif story == 'EOF' || story == 'r'
-            page = old_page
+            page == 0 ? quit : (page = old_page)
           end
           no_request = false
         else

@@ -132,9 +132,8 @@ module PT
           description: description
         }
         params[:story_type] = options[:type] if options[:type]
-
         story = @client.create_story(params)
-        congrats("Story has been created \n #{story.url}")
+        congrats("Story with title #{story.name} has been created \n #{story.url}")
       else
         create_interactive_story(requested_by_id: @local_config[:user_id])
       end
