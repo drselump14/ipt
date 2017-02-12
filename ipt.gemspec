@@ -4,15 +4,15 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'pt/version'
 
 Gem::Specification.new do |spec|
-  spec.name              = "pt"
+  spec.name              = "ipt"
   spec.version           = PT::VERSION
-  spec.authors           = ["Slamet Kristanto","Raul Murciano", "Orta Therox", "Engineering at Causes"]
-  spec.email             = ["cakmet14@gmail.com", "raul@murciano.net", "orta.therox@gmail.com", "eng@causes.com"]
+  spec.authors           = ["Slamet Kristanto"]
+  spec.email             = ["cakmet14@gmail.com"]
   spec.licenses          = ['MIT']
-  spec.homepage          = "http://www.github.com/raul/pt"
-  spec.summary           = "Pivotal Tracker CLI (API v5)"
-  spec.description       = "Pivotal Tracker Command Line Interface"
-  spec.executables       = ["pt"]
+  spec.homepage          = "http://www.github.com/drselump14/ipt"
+  spec.summary           = "Interactive Pivotal Tracker CLI (API v5)"
+  spec.description       = "Interactive Pivotal Tracker Command Line Interface"
+  spec.executables       = ["ipt"]
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
