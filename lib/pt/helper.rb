@@ -183,6 +183,8 @@ module PT
             create_interactive_story
           elsif story == 'EOF' || story == 'r'
             page == 0 ? quit : (page = old_page)
+          elsif story == 'r'
+            page = old_page
           end
           no_request = false
         else
