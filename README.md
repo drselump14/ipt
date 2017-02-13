@@ -1,4 +1,5 @@
 [![Gem Version](https://badge.fury.io/rb/pt.svg)](https://badge.fury.io/rb/pt)
+[![Build Status](https://travis-ci.org/drselump14/ipt.svg?branch=master)](https://travis-ci.org/drselump14/ipt)
 
 # pt
 
