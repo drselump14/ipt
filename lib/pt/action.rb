@@ -70,7 +70,8 @@ module PT
     end
 
     def comment_story(story)
-      comment = ask("Write your comment")
+      say("Please write your comment")
+      comment = edit_using_editor
       if @client.comment_task(story, comment)
         congrats("Comment sent, thanks!")
         save_recent_task( story.id )
@@ -185,7 +186,9 @@ module PT
       editor = ENV.fetch('EDITOR') { 'vi' }
       temp_path = "/tmp/editor-#{ Process.pid }.txt"
       system "#{ editor } #{ temp_path }"
-      File.read(temp_path)
+      content = File.read(temp_path)
+      File.delete(temp_path)
+      content
     end
   end
 end
