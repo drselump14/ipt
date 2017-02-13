@@ -4,7 +4,7 @@ RSpec.shared_context "cli filter" do
   let(:filter) { 'mywork' }
   before :each do
     VCR.use_cassette(filter) do
-      run "bin/pt #{filter}"
+      run "bin/ipt #{filter}"
       stop_all_commands
     end
   end
@@ -15,7 +15,7 @@ describe PT::CLI, type: :aruba do
   describe 'pt mywork' do
     before :each do
       VCR.use_cassette('my work') do
-        run 'bin/pt'
+        run 'bin/ipt'
         stop_all_commands
       end
     end
@@ -53,7 +53,7 @@ describe PT::CLI, type: :aruba do
     context 'with title' do
       before do
         VCR.use_cassette('create with title parameter') do
-          run "bin/pt create #{title}"
+          run "bin/ipt create #{title}"
         end
         stop_all_commands
       end
@@ -64,13 +64,12 @@ describe PT::CLI, type: :aruba do
     context 'without title' do
       before do
         VCR.use_cassette('create without title parameter') do
-          run "bin/pt create"
+          run "bin/ipt create"
         end
-        type 'title<CR>'
         stop_all_commands
       end
 
-      it { expect(last_command_started.output).to include 'assign'}
+      it { expect(last_command_started.output).to include 'new task'}
     end
   end
 
@@ -86,7 +85,7 @@ describe PT::CLI, type: :aruba do
   describe 'pt find <query>' do
     before :each do
       VCR.use_cassette('find') do
-        run "bin/pt find #{title}"
+        run "bin/ipt find #{title}"
       end
       stop_all_commands
     end

@@ -6,7 +6,7 @@ module PT
       title story.name.red
       title('========================================='.red)
       estimation = [-1, nil].include?(story.estimate) ? "Unestimated" : "#{story.estimate} points"
-      requester = story.requested_by ? story.requested_by.initials : @local_config[:user_name]
+      requester = story.requested_by ? story.requested_by.initials : Settings[:user_name]
       message "#{story.current_state.capitalize} #{story.story_type} | #{estimation} | Req: #{requester} | Owners: #{story.owners.map(&:initials).join(',')} | ID: #{story.id}"
 
       if story.instance_variable_get(:@labels).present?
@@ -144,7 +144,7 @@ module PT
       congrats("Story URL copied")
     end
 
-    def create_interactive_story(options={})
+    def create_interactive_story
       # set title
       title = ask("Name for the new task:")
 
@@ -170,7 +170,7 @@ module PT
       story = @client.create_story(
         name: title,
         owner_ids: [owner_id],
-        requested_by_id: options[:requested_by_id],
+        requested_by_id: Settings[:user_id],
         story_type: type,
         description: description
       )

@@ -27,9 +27,8 @@ module PT
     def initialize(*args)
       super
       @io = HighLine.new
-      @global_config = load_global_config
-      @local_config = load_local_config
-      @client = Client.new(@global_config[:api_number], @local_config)
+      @config = PT::Configuration.new
+      @client = Client.new
       @project = @client.project
     end
 
@@ -82,7 +81,7 @@ module PT
     desc 'mywork', 'list all your stories'
     def mywork
       select_story_from_paginated_table(title: 'My Work') do |page|
-        @client.get_stories(filter: "owner:#{@local_config[:user_name]} -state:accepted", page: page)
+        @client.get_stories(filter: "owner:#{Settings[:user_name]} -state:accepted", page: page)
       end
     end
 
@@ -98,7 +97,7 @@ module PT
     def recent
       title("Your recent stories from #{project_to_s}")
       select_story_from_paginated_table(title: "recent stories") do |page|
-        @client.get_stories(filter: @local_config[:recent_tasks].join(','), page: page)
+        @client.get_stories(filter: Settings[:recent_tasks].join(','), page: page)
       end
     end
 
@@ -127,7 +126,7 @@ module PT
         description = edit_using_editor if options[:m]
         params = {
           name: title,
-          requested_by_id: @local_config[:user_id],
+          requested_by_id: Settings[:user_id],
           owner_ids: [owner_id],
           description: description
         }
@@ -135,7 +134,7 @@ module PT
         story = @client.create_story(params)
         congrats("Story with title #{story.name} has been created \n #{story.url}")
       else
-        create_interactive_story(requested_by_id: @local_config[:user_id])
+        create_interactive_story
       end
     end
 

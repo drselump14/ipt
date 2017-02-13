@@ -1,92 +1,8 @@
+require 'highline'
 module PT
   module Helper
 
-    GLOBAL_CONFIG_PATH = ENV['HOME'] + "/.pt"
-    LOCAL_CONFIG_PATH = Dir.pwd + '/.pt'
     ACTION = %w[show open start finish deliver accept reject done assign estimate tasks comment label ]
-
-    def load_global_config
-
-      # skip global config if env vars are set
-      if ENV['PIVOTAL_EMAIL'] and ENV['PIVOTAL_API_KEY']
-        config = {
-          :email => ENV['PIVOTAL_EMAIL'],
-          :api_number => ENV['PIVOTAL_API_KEY']
-        }
-        return config
-      end
-
-      config = YAML.load(File.read(GLOBAL_CONFIG_PATH)) rescue {}
-      if config.empty?
-        message "I can't find info about your Pivotal Tracker account in #{GLOBAL_CONFIG_PATH}."
-        while !config[:api_number] do
-          config[:api_number] = ask "What is your token?"
-        end
-        congrats "Thanks!",
-          "Your API id is " + config[:api_number],
-          "I'm saving it in #{GLOBAL_CONFIG_PATH} so you don't have to log in again."
-        save_config(config, GLOBAL_CONFIG_PATH)
-      end
-      config
-    end
-
-    def get_local_config_path
-      # If the local config path does not exist, check to see if we're in a git repo
-      # And if so, try the top level of the checkout
-      if (!File.exist?(LOCAL_CONFIG_PATH) && system('git rev-parse 2> /dev/null'))
-        return `git rev-parse --show-toplevel`.chomp() + '/.pt'
-      else
-        return LOCAL_CONFIG_PATH
-      end
-    end
-
-    def load_local_config
-      check_local_config_path
-      config = YAML.load(File.read(get_local_config_path())) rescue {}
-
-
-      if ENV['PIVOTAL_PROJECT_ID']
-
-        config[:project_id] = ENV['PIVOTAL_PROJECT_ID']
-
-        @client = Client.new(@global_config[:api_number])
-        project = @client.get_project(config[:project_id])
-        config[:project_name] = project.name
-
-        membership = @client.get_my_info
-        config[:user_name], config[:user_id], config[:user_initials] = membership.name, membership.id, membership.initials
-        save_config(config, get_local_config_path())
-
-      end
-
-      if config.empty?
-        message "I can't find info about this project in #{get_local_config_path()}"
-        @client = Client.new(@global_config[:api_number])
-        projects = ProjectTable.new(@client.get_projects)
-        project = select("Please select the project for the current directory", projects)
-        config[:project_id], config[:project_name] = project.id, project.name
-        project = @client.get_project(project.id)
-        membership = @client.get_my_info
-        config[:user_name], config[:user_id], config[:user_initials] = membership.name, membership.id, membership.initials
-        congrats "Thanks! I'm saving this project's info",
-          "in #{get_local_config_path()}: remember to .gitignore it!"
-        save_config(config, get_local_config_path())
-      end
-      config
-    end
-
-    def check_local_config_path
-      if GLOBAL_CONFIG_PATH == get_local_config_path()
-        error("Please execute .pt inside your project directory and not in your home.")
-        exit
-      end
-    end
-
-    def save_config(config, path)
-      File.new(path, 'w') unless File.exists?(path)
-      File.open(path, 'w') {|f| f.write(config.to_yaml) }
-    end
-
     # I/O
 
     def split_lines(text)
@@ -119,19 +35,19 @@ module PT
     end
 
     def ask(msg)
-      @io.ask(msg)
+      HighLine.new.ask(msg)
     end
 
     def ask_secret(msg)
-      @io.ask("#{msg.bold}"){ |q| q.echo = '*' }
+      HighLine.new.ask("#{msg.bold}"){ |q| q.echo = '*' }
     end
 
     def user_s
-      "#{@local_config[:user_name]} (#{@local_config[:user_initials]})"
+      "#{Settings[:user_name]} (#{Settings[:user_initials]})"
     end
 
     def project_to_s
-      "Project #{@local_config[:project_name].upcase}"
+      "Project #{Settings[:project_name].upcase}"
     end
 
     def task_type_or_nil query
@@ -143,7 +59,7 @@ module PT
 
     def task_by_id_or_pt_id id
       if id < 1000
-        tasks = @client.get_my_work(@local_config[:user_name])
+        tasks = @client.get_my_work(Settings[:user_name])
         table = TasksTable.new(tasks)
         table[id]
       else
@@ -221,21 +137,21 @@ module PT
 
     def save_recent_task( task_id )
       # save list of recently accessed tasks
-      unless (@local_config[:recent_tasks])
-        @local_config[:recent_tasks] = Array.new();
+      unless (Settings[:recent_tasks])
+        Settings[:recent_tasks] = Array.new();
       end
-      @local_config[:recent_tasks].unshift( task_id )
-      @local_config[:recent_tasks] = @local_config[:recent_tasks].uniq()
-      if @local_config[:recent_tasks].length > 10
-        @local_config[:recent_tasks].pop()
+      Settings[:recent_tasks].unshift( task_id )
+      Settings[:recent_tasks] = Settings[:recent_tasks].uniq()
+      if Settings[:recent_tasks].length > 10
+        Settings[:recent_tasks].pop()
       end
-      save_config( @local_config, get_local_config_path() )
+      save_config( Settings, @config.get_local_config_path )
     end
 
     def select(msg, table)
       if table.length > 0
         begin
-          table.print @global_config
+          table.print
           row = ask "#{msg} (1-#{table.length}, 'q' to exit)".magenta
           if row == 'q'
             quit
@@ -248,7 +164,7 @@ module PT
         end until selected
         selected
       else
-        table.print @global_config
+        table.print
         error "Sorry, there are no options to select."
         return 'EOF'
       end
@@ -283,7 +199,7 @@ module PT
           elsif story == 'q'
             quit
           elsif story == 'c'
-            create_interactive_story(requested_by_id: @local_config[:user_id])
+            create_interactive_story
           elsif story == 'EOF' || story == 'r'
             page == 0 ? quit : (page = old_page)
           end

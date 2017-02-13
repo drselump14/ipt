@@ -3,23 +3,16 @@ require 'uri'
 require 'tracker_api'
 
 module PT
-  class Client
+  class Client < SimpleDelegator
 
     STORY_FIELDS=':default,requested_by(initials),owners(initials),tasks(complete,description),comments(text,file_attachment_ids,person(initials))'
 
-    attr_reader :config, :project, :client, :total_record, :limit
+    attr_reader :config, :client, :total_record, :limit
 
-    def self.get_api_token(email, password)
-      PivotalAPI::Me.retrieve(email, password)
-    rescue RestClient::Unauthorized
-      raise PT::InputError.new("Bad email/password combination.")
-    end
-
-    def initialize(token, local_config=nil)
-      @client = TrackerApi::Client.new(token: token)
-      @config = local_config
-      @project = @client.project(local_config[:project_id]) if local_config
-      @limit = config[:limit] || 10
+    def initialize
+      @client = TrackerApi::Client.new(token: Settings[:pivotal_api_key])
+      self.__setobj__(@client)
+      @limit = Settings[:limit] || 10
     end
 
     def total_page
@@ -32,25 +25,8 @@ module PT
        ((offset.to_f/limit)+1).to_i
     end
 
-    def get_project(project_id)
-      project = @client.project(project_id)
-      project
-    end
-
-    def get_projects
-      @client.projects
-    end
-
-    def get_membership(email)
-      PivotalTracker::Membership.all(project).select{ |m| m.email == email }.first
-    end
-
-    def get_my_info
-      @client.me
-    end
-
-    def get_current_iteration(project)
-      PivotalTracker::Iteration.current(project)
+    def project
+      @client.project(Settings[:project_id])
     end
 
     def get_activities
@@ -117,7 +93,7 @@ module PT
     end
 
     def get_stories(params={})
-      limit = config[:limit] || 10
+      limit = @limit || 10
       page = params[:page] || 0
       offset = page*limit
       filter = params[:filter] || '-state=accepted'
