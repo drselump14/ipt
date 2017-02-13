@@ -17,10 +17,11 @@ end
 module PT
   class CLI < Thor
     include PT::Action
-    include PT::Helper
+    include PT::IO
     attr_reader :project
 
     TYPE=%w[feature bug chore release]
+    ACTION = %w[show open start finish deliver accept reject done assign estimate tasks comment label ]
 
     default_task :mywork
 
@@ -154,15 +155,5 @@ module PT
       end
       show_story(story)
     end
-
-    # desc "updates","shows number recent activity from your current project"
-    # def updates
-    #   activities = @client.get_activities
-    #   tasks = @client.get_my_work
-    #   title("Recent Activity on #{project_to_s}")
-    #   activities.each do |activity|
-    #     show_activity(activity, tasks)
-    #   end
-    # end
   end
 end

@@ -4,7 +4,7 @@ require 'pt/client'
 require 'pt/data_row'
 require 'pt/data_table'
 require 'pt/action'
-require 'pt/helper'
+require 'pt/io'
 require 'pt/configuration'
 require 'pt/cli'
 

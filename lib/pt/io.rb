@@ -1,6 +1,6 @@
 require 'highline'
 module PT
-  module Helper
+  module IO
 
     ACTION = %w[show open start finish deliver accept reject done assign estimate tasks comment label ]
     # I/O
@@ -67,10 +67,6 @@ module PT
       end
     end
 
-    def show_activity(activity, tasks)
-      message("#{activity.message}")
-    end
-
     def get_open_story_task_from_params(task)
       title "Pending tasks for '#{task.name}'"
       task_struct = Struct.new(:description, :position)
@@ -84,49 +80,8 @@ module PT
       select("Pick task to edit, 1 to add new task", table)
     end
 
-    def edit_story_task(task)
-      action_class = Struct.new(:action, :key)
-
-      table = ActionTable.new([
-        action_class.new('Complete', :complete),
-        # action_class.new('Delete', :delete),
-        action_class.new('Edit', :edit)
-        # Move?
-      ])
-      action_to_execute = select('What to do with todo?', table)
-
-      task.project_id = project.id
-      task.client = project.client
-      case action_to_execute.key
-      when :complete then
-        task.complete = true
-        congrats('Todo task completed!')
-        # when :delete then
-        #   task.delete
-        #   congrats('Todo task removed')
-      when :edit then
-        new_description = ask('New task description')
-        task.description = new_description
-        congrats("Todo task changed to: \"#{task.description}\"")
-      end
-      task.save
-    end
-
     def clear
       puts "\e[H\e[2J"
-    end
-
-    def save_recent_task( task_id )
-      # save list of recently accessed tasks
-      unless (Settings[:recent_tasks])
-        Settings[:recent_tasks] = Array.new();
-      end
-      Settings[:recent_tasks].unshift( task_id )
-      Settings[:recent_tasks] = Settings[:recent_tasks].uniq()
-      if Settings[:recent_tasks].length > 10
-        Settings[:recent_tasks].pop()
-      end
-      @config.save_config( Settings, @config.get_local_config_path )
     end
 
     def select(msg, table)
@@ -192,12 +147,6 @@ module PT
           no_request = true
         end
       end while true
-    end
-
-    def choose_person
-      members = @client.get_members
-      table = PersonsTable.new(members.map(&:person))
-      select("Please select a member to see his tasks.", table)
     end
 
     def choose_action(story)

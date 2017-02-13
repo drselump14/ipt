@@ -182,6 +182,34 @@ module PT
       story
     end
 
+    def edit_story_task(task)
+      action_class = Struct.new(:action, :key)
+
+      table = ActionTable.new([
+        action_class.new('Complete', :complete),
+        # action_class.new('Delete', :delete),
+        action_class.new('Edit', :edit)
+        # Move?
+      ])
+      action_to_execute = select('What to do with todo?', table)
+
+      task.project_id = project.id
+      task.client = project.client
+      case action_to_execute.key
+      when :complete then
+        task.complete = true
+        congrats('Todo task completed!')
+        # when :delete then
+        #   task.delete
+        #   congrats('Todo task removed')
+      when :edit then
+        new_description = ask('New task description')
+        task.description = new_description
+        congrats("Todo task changed to: \"#{task.description}\"")
+      end
+      task.save
+    end
+
     def edit_using_editor
       editor = ENV.fetch('EDITOR') { 'vi' }
       temp_path = "/tmp/editor-#{ Process.pid }.txt"
@@ -190,6 +218,26 @@ module PT
       File.delete(temp_path)
       content
     end
+
+    def choose_person
+      members = @client.get_members
+      table = PersonsTable.new(members.map(&:person))
+      select("Please select a member to see his tasks.", table)
+    end
+
+    def save_recent_task( task_id )
+      # save list of recently accessed tasks
+      unless (Settings[:recent_tasks])
+        Settings[:recent_tasks] = Array.new();
+      end
+      Settings[:recent_tasks].unshift( task_id )
+      Settings[:recent_tasks] = Settings[:recent_tasks].uniq()
+      if Settings[:recent_tasks].length > 10
+        Settings[:recent_tasks].pop()
+      end
+      @config.save_config( Settings, @config.get_local_config_path )
+    end
+
   end
 end
 

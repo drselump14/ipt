@@ -1,7 +1,7 @@
 require 'config'
 module PT
   class Configuration
-    include PT::Helper
+    include PT::IO
     GLOBAL_CONFIG_PATH = ENV['HOME'] + "/.pt.yml"
     LOCAL_CONFIG_PATH = Dir.pwd + '/.pt.yml'
 
