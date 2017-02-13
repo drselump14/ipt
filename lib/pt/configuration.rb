@@ -5,6 +5,8 @@ module PT
     GLOBAL_CONFIG_PATH = ENV['HOME'] + "/.pt.yml"
     LOCAL_CONFIG_PATH = Dir.pwd + '/.pt.yml'
 
+    attr_reader :client
+
     def initialize
       Config.load_and_set_settings(GLOBAL_CONFIG_PATH, get_local_config_path)
       unless (Settings[:pivotal_api_key] ||= ENV['PIVOTAL_API_KEY'])
@@ -39,6 +41,13 @@ module PT
         return LOCAL_CONFIG_PATH
       end
     end
+
+    def save_config(config, path)
+      config = stringify(config)
+      File.new(path, 'w') unless File.exists?(path)
+      File.open(path, 'w') {|f| f.write(config.to_yaml) }
+    end
+
     private
 
       def check_local_config_path
@@ -46,12 +55,6 @@ module PT
           error("Please execute .pt inside your project directory and not in your home.")
           exit
         end
-      end
-
-      def save_config(config, path)
-        config = stringify(config)
-        File.new(path, 'w') unless File.exists?(path)
-        File.open(path, 'w') {|f| f.write(config.to_yaml) }
       end
 
       def stringify(hash)

@@ -11,10 +11,6 @@ module PT
       if defined? orig.current_state
         @state = orig.current_state
       end
-
-      if defined? orig.owners
-        @owners = orig.owners.map(&:initials).join(',')
-      end
     end
 
     def method_missing(method)
@@ -36,6 +32,12 @@ module PT
         _name[0..15] + '...'
       else
         _name
+      end
+    end
+
+    def owners
+      if @record.instance_variable_get(:@owners).present?
+        @record.owners.map(&:initials).join(',')
       end
     end
 

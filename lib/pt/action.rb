@@ -7,7 +7,10 @@ module PT
       title('========================================='.red)
       estimation = [-1, nil].include?(story.estimate) ? "Unestimated" : "#{story.estimate} points"
       requester = story.requested_by ? story.requested_by.initials : Settings[:user_name]
-      message "#{story.current_state.capitalize} #{story.story_type} | #{estimation} | Req: #{requester} | Owners: #{story.owners.map(&:initials).join(',')} | ID: #{story.id}"
+      if story.instance_variable_get(:@owners).present?
+        owners = story.owners.map(&:initials).join(',')
+      end
+      message "#{story.current_state.capitalize} #{story.story_type} | #{estimation} | Req: #{requester} | Owners: #{owners} | ID: #{story.id}"
 
       if story.instance_variable_get(:@labels).present?
         message "Labels: " + story.labels.map(&:name).join(', ')

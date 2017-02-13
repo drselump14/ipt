@@ -28,7 +28,7 @@ module PT
       super
       @io = HighLine.new
       @config = PT::Configuration.new
-      @client = Client.new
+      @client = @config.client || Client.new
       @project = @client.project
     end
 

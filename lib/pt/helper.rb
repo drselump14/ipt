@@ -67,25 +67,6 @@ module PT
       end
     end
 
-    def find_task query
-      members = @client.get_members
-      members.each do | member |
-        if member.name.downcase.index query
-          return member.name
-        end
-      end
-      nil
-    end
-
-    def find_owner query
-      if query
-        member = @client.get_member(query)
-        return member ? member.person : nil
-      end
-      nil
-    end
-
-
     def show_activity(activity, tasks)
       message("#{activity.message}")
     end
@@ -145,7 +126,7 @@ module PT
       if Settings[:recent_tasks].length > 10
         Settings[:recent_tasks].pop()
       end
-      save_config( Settings, @config.get_local_config_path )
+      @config.save_config( Settings, @config.get_local_config_path )
     end
 
     def select(msg, table)

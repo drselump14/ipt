@@ -38,7 +38,7 @@ module PT
     end
 
     def get_my_work
-      project.stories(filter: "owner:#{config[:user_name]} -state:accepted", limit: 50, fields: STORY_FIELDS)
+      project.stories(filter: "owner:#{Settings[:user_name]} -state:accepted", limit: 50, fields: STORY_FIELDS)
     end
 
     def search_for_story(query, params={})
@@ -52,38 +52,38 @@ module PT
     alias :get_story :get_task_by_id
 
     def get_my_open_tasks(params={})
-      params[:filter] =  "owner:#{config[:user_name]}"
+      params[:filter] =  "owner:#{Settings[:user_name]}"
       get_stories(params)
     end
 
     def get_stories_to_estimate(params={})
-      params[:filter] =  "owner:#{config[:user_name]} type:feature estimate:-1"
+      params[:filter] =  "owner:#{Settings[:user_name]} type:feature estimate:-1"
       get_stories(params)
     end
 
     def get_stories_to_start(params={})
-      params[:filter] =  "owner:#{config[:user_name]} type:feature,bug state:unscheduled,rejected,unstarted"
+      params[:filter] =  "owner:#{Settings[:user_name]} type:feature,bug state:unscheduled,rejected,unstarted"
       tasks = get_stories(params)
       tasks.reject{ |t| (t.story_type == 'feature') && (!t.estimate) }
     end
 
     def get_stories_to_finish(params={})
-      params[:filter] =  "owner:#{config[:user_name]} -state:unscheduled,rejected"
+      params[:filter] =  "owner:#{Settings[:user_name]} -state:unscheduled,rejected"
       get_stories(params)
     end
 
     def get_stories_to_deliver(params={})
-      params[:filter] =  "owner:#{config[:user_name]} -state:delivered,accepted,rejected"
+      params[:filter] =  "owner:#{Settings[:user_name]} -state:delivered,accepted,rejected"
       get_stories(params)
     end
 
     def get_stories_to_accept(params={})
-      params[:filter] =  "owner:#{config[:user_name]} -state:accepted"
+      params[:filter] =  "owner:#{Settings[:user_name]} -state:accepted"
       get_stories(params)
     end
 
     def get_stories_to_reject(params={})
-      params[:filter] =  "owner:#{config[:user_name]} -state:rejected"
+      params[:filter] =  "owner:#{Settings[:user_name]} -state:rejected"
       get_stories(params)
     end
 
