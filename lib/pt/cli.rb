@@ -149,7 +149,11 @@ module PT
     end
 
     desc "find [query] " ,"looks in your stories by title and presents it"
-    def find(query)
+    long_desc <<-LONGDESC
+      search using pivotal tracker search query
+    LONGDESC
+    def find(query=nil)
+      query ||= ask("Please type seach query") { |q| q.readline = true }
       story = select_story_from_paginated_table(title: "Search result for #{query}")do |page|
         @client.get_stories(filter: query, page: page)
       end

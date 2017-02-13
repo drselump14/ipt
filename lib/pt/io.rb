@@ -94,7 +94,7 @@ module PT
           elsif row.to_i > 0
             selected = table[row]
             error "Invalid selection, try again:" unless selected
-          elsif %w[n p q c r].include?(row)
+          elsif %w[n p q c r f].include?(row)
             return row
           end
         end until selected
@@ -113,12 +113,15 @@ module PT
       begin
         say('Please wait...')
         stories = block.call(page) unless no_request
-        title = (options[:title] || 'Stories').to_s + " [#{@client.current_page}/#{@client.total_page}]"
+        current_page = @client.current_page
+        total_page = @client.total_page
+        title = (options[:title] || 'Stories').to_s + " [#{current_page}/#{total_page}]"
         table = TasksTable.new(stories, title)
         clear
         say "Pivotal Tracker Command Line v#{PT::VERSION}".magenta
         say '========================================================================================='.green
-        say "[number]: select story | [n]:next data | [p]:previous data | [c]:create story | [r]:refresh | [q]: quit".green
+        help = "[num]: select | #{'[n]:next |' if current_page < total_page} #{'[p]:previous |' if current_page > 1} [c]:create | [r]:refresh | [q]: quit"
+        say help.green
         say '========================================================================================='.green
         case story = select(prompt, table)
         when TrackerApi::Resources::Story
@@ -136,8 +139,16 @@ module PT
             quit
           elsif story == 'c'
             create_interactive_story
-          elsif story == 'EOF' || story == 'r'
-            page == 0 ? quit : (page = old_page)
+          elsif story == 'f'
+            choose_filter
+          elsif story == 'EOF'
+            HighLine.new.choose do |menu|
+              menu.prompt = "Please choose action ( [number/name]:select action)".magenta
+              menu.choice(:filter) { choose_filter }
+              menu.choice(:back) { say('back to table ....'); return :no_request }
+              menu.choice(:quit) { quit }
+              menu.default = :quit
+            end
           elsif story == 'r'
             page = old_page
           end
@@ -158,7 +169,7 @@ module PT
         menu.choice(:deliver, nil,'deliver'.yellow) { deliver_story(story) }
         menu.choice(:accept, nil,'accept'.green) { accept_story(story) }
         menu.choice(:reject, nil,'reject'.red) { reject_story(story) }
-        %w[assign estimate tasks comment label].each do |action|
+        %w[assign estimate tasks comment label open].each do |action|
           menu.choice(action.to_sym) { send("#{action}_story", story) }
         end
         menu.choice('id (copy story id)') { copy_story_id(story)}
@@ -166,6 +177,22 @@ module PT
         menu.choice(:back) { say('back to table ....'); return :no_request }
         menu.choice(:quit) { quit }
         menu.default = :view
+      end
+    end
+
+    def choose_filter
+      HighLine.new.choose do |menu|
+        menu.prompt = "Please choose filter ( [number/name]:select filter | [Enter]:back to table)".magenta
+        %w[current backlog mywork bug feature unstarted started finished delivered accepted rejected].each do |f|
+          menu.choice(f.to_sym) do
+            say 'filtering ' + f
+            send(f.to_sym)
+          end
+        end
+        menu.choice(:search) { find }
+        menu.choice(:back) { say('back to table ....'); return :no_request }
+        menu.choice(:quit) { quit }
+        menu.default = :back
       end
     end
   end

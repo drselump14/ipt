@@ -37,7 +37,7 @@ module PT
 
     def owners
       if @record.instance_variable_get(:@owners).present?
-        @record.owners.map(&:initials).join(',')
+        @record.owners.map{|o| o.initials == Settings[:user_initials] ? o.initials.red : o.initials }.join(',')
       end
     end
 
@@ -63,14 +63,13 @@ module PT
       t = @record.story_type
       case t
       when 'bug'
-        # t.red
-        "🐞"
+        '🐞'
       when 'feature'
-        "⭐"
+        '⭐'
       when 'release'
         '🏁'
       when 'chore'
-        '⚙'
+        '⚙️'
       else
         t
       end

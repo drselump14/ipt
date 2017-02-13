@@ -61,6 +61,7 @@ module PT
 
     def open_story story
       `open #{story.url}`
+      return :no_request
     end
 
     def assign_story story
