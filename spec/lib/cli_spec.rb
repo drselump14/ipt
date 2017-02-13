@@ -23,6 +23,18 @@ describe PT::CLI, type: :aruba do
     it { expect(last_command_started.output).to include 'Kris' }
   end
 
+  %w[ current backlog ].each do |scope|
+    describe "pt #{scope}" do
+      before :each do
+        VCR.use_cassette("#{scope} iteration", record: :new_episodes) do
+          run "bin/ipt #{scope}"
+          stop_all_commands
+        end
+      end
+      it { expect(last_command_started.output).to include "#{scope} iteration" }
+    end
+  end
+
   describe 'pt bug' do
     include_context 'cli filter' do
       let(:filter) { 'bug' }

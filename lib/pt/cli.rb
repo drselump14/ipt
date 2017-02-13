@@ -85,6 +85,15 @@ module PT
       end
     end
 
+    %w[ current backlog ].each do |scope|
+      desc "#{scope}", 'list all stories for #{scope} iteration'
+      define_method(scope.to_sym) do
+        select_story_from_paginated_table(title: "#{scope} iteration") do |page|
+          @client.get_stories_from_iteration(scope: scope)
+        end
+      end
+    end
+
     desc "list [owner]", "list all stories from owner"
     def list(owner = nil)
       owner = choose_person.initials unless owner

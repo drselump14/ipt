@@ -100,6 +100,11 @@ module PT
       project.stories limit: limit, fields: STORY_FIELDS, auto_paginate: false, offset: offset, filter: filter
     end
 
+    def get_stories_from_iteration(params={})
+      scope = params[:scope] || 'current'
+      project.iterations(scope: scope, fields: ":default,stories(#{STORY_FIELDS})").first&.stories || []
+    end
+
 
     def get_member(query)
       member = project.memberships.select{ |m| m.person.name.downcase.start_with?(query.downcase) || m.person.initials.downcase == query.downcase }
