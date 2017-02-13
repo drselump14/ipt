@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.shared_context "cli filter" do
   let(:filter) { 'mywork' }
   before :each do
-    VCR.use_cassette(filter) do
+    VCR.use_cassette(filter, record: :new_episodes) do
       run "bin/ipt #{filter}"
       stop_all_commands
     end
@@ -14,7 +14,7 @@ describe PT::CLI, type: :aruba do
   let(:title) { 'random' }
   describe 'pt mywork' do
     before :each do
-      VCR.use_cassette('my work') do
+      VCR.use_cassette('my work', record: :new_episodes) do
         run 'bin/ipt'
         stop_all_commands
       end
@@ -52,7 +52,7 @@ describe PT::CLI, type: :aruba do
   describe "pt create" do
     context 'with title' do
       before do
-        VCR.use_cassette('create with title parameter') do
+        VCR.use_cassette('create with title parameter', record: :new_episodes) do
           run "bin/ipt create #{title}"
         end
         stop_all_commands
@@ -63,7 +63,7 @@ describe PT::CLI, type: :aruba do
 
     context 'without title' do
       before do
-        VCR.use_cassette('create without title parameter') do
+        VCR.use_cassette('create without title parameter', record: :new_episodes) do
           run "bin/ipt create"
         end
         stop_all_commands
@@ -84,7 +84,7 @@ describe PT::CLI, type: :aruba do
 
   describe 'pt find <query>' do
     before :each do
-      VCR.use_cassette('find') do
+      VCR.use_cassette('find', record: :new_episodes) do
         run "bin/ipt find #{title}"
       end
       stop_all_commands
