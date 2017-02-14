@@ -6,7 +6,7 @@
 Minimal client to use Pivotal Tracker API v5 from the command line
 
 # Demo
-[![asciicast](https://asciinema.org/a/d1er0ca9kg6yw1o2hpyjuq5ku.png)](https://asciinema.org/a/d1er0ca9kg6yw1o2hpyjuq5ku)
+[![asciicast](https://asciinema.org/a/bw6pt5x98cw35lajkliktx6iz.png)](https://asciinema.org/a/bw6pt5x98cw35lajkliktx6iz)
 
 ## Setup
 
