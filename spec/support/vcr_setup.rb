@@ -8,4 +8,8 @@ VCR.configure do |c|
   c.default_cassette_options = { serialize_with: :json }
   c.hook_into :faraday
   c.allow_http_connections_when_no_cassette = true
+  c.preserve_exact_body_bytes do |http_message|
+    http_message.body.encoding.name == 'ASCII-8BIT' ||
+      !http_message.body.valid_encoding?
+  end
 end

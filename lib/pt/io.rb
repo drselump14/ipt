@@ -163,7 +163,8 @@ module PT
     def choose_action(story)
       HighLine.new.choose do |menu|
         menu.prompt = "Please choose action ( [number/name]:select action | [Enter]:show story )".magenta
-        menu.choice(:view, 'View details of story','view') { show_story(story) }
+        menu.choice(:view, 'view details of story','view') { show_story(story) }
+        menu.choice(:edit, nil,'edit story') { edit_story(story) }
         menu.choice(:start, nil,'start'.white) { start_story(story) }
         menu.choice(:finish, nil,'finish'.blue) { finish_story(story) }
         menu.choice(:deliver, nil,'deliver'.yellow) { deliver_story(story) }

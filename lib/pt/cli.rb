@@ -21,7 +21,7 @@ module PT
     attr_reader :project
 
     TYPE=%w[feature bug chore release]
-    ACTION = %w[show open start finish deliver accept reject done assign estimate tasks comment label ]
+    ACTION = %w[show open start finish deliver accept reject done assign estimate tasks comment label edit]
 
     default_task :mywork
 

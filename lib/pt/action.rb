@@ -183,6 +183,29 @@ module PT
       story
     end
 
+    def edit_story(story)
+      # set title
+      if ask("Edit title?(y/n) [#{story.name}]")  { |yn| yn.limit = 1, yn.validate = /[yn]/i } == 'y'
+        say('Edit your story name')
+        story.name = edit_using_editor(story.name)
+      end
+
+      # set story type
+      story.story_type = case ask('Edit Type? (f)eature (c)hore, (b)ug, enter to skip)')
+             when 'c', 'chore'
+               'chore'
+             when 'b', 'bug'
+               'bug'
+             when 'f', 'feature'
+               'feature'
+             end
+
+      story.description = edit_using_editor(story.description) if ask('Do you want to edit description now?(y/n)') == 'y'
+      story = story.save
+      congrats("'#{story.name}' has been edited \n #{story.url}")
+      story
+    end
+
     def edit_story_task(task)
       action_class = Struct.new(:action, :key)
 
@@ -211,9 +234,10 @@ module PT
       task.save
     end
 
-    def edit_using_editor
+    def edit_using_editor(content=nil)
       editor = ENV.fetch('EDITOR') { 'vi' }
       temp_path = "/tmp/editor-#{ Process.pid }.txt"
+      File.write(temp_path, content) if content
       system "#{ editor } #{ temp_path }"
       content = File.read(temp_path)
       File.delete(temp_path)
