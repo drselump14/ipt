@@ -17,12 +17,12 @@ module PT
 
     def total_page
       @total_record = @client.last_response.env.response_headers["X-Tracker-Pagination-Total"]
-      (@total_record.to_f/limit).ceil
+      @total_record ? (@total_record.to_f/limit).ceil : 1
     end
 
     def current_page
-       offset = @client.last_response.env.response_headers["X-Tracker-Pagination-Offset"]
-       ((offset.to_f/limit)+1).to_i
+      offset = @client.last_response.env.response_headers["X-Tracker-Pagination-Offset"]
+      offset ? ((offset.to_f/limit)+1).to_i.ceil : 1
     end
 
     def project
@@ -101,8 +101,10 @@ module PT
     end
 
     def get_stories_from_iteration(params={})
+      page = params[:page] || 0
+      puts "page #{page}"
       scope = params[:scope] || 'current'
-      project.iterations(scope: scope, fields: ":default,stories(#{STORY_FIELDS})").first&.stories || []
+      project.iterations(scope: scope, fields: ":default,stories(#{STORY_FIELDS})")[page]&.stories || []
     end
 
 

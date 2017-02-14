@@ -50,23 +50,6 @@ module PT
       "Project #{Settings[:project_name].upcase}"
     end
 
-    def task_type_or_nil query
-      if (["feature", "bug", "chore"].index query)
-        return query
-      end
-      nil
-    end
-
-    def task_by_id_or_pt_id id
-      if id < 1000
-        tasks = @client.get_my_work(Settings[:user_name])
-        table = TasksTable.new(tasks)
-        table[id]
-      else
-        @client.get_task_by_id id
-      end
-    end
-
     def get_open_story_task_from_params(task)
       title "Pending tasks for '#{task.name}'"
       task_struct = Struct.new(:description, :position)
@@ -145,7 +128,7 @@ module PT
             HighLine.new.choose do |menu|
               menu.prompt = "Please choose action ( [number/name]:select action)".magenta
               menu.choice(:filter) { choose_filter }
-              menu.choice(:back) { say('back to table ....'); return :no_request }
+              menu.choice(:back) { say('back to table ....'); page-=1 }
               menu.choice(:quit) { quit }
               menu.default = :quit
             end

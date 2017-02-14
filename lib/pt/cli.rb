@@ -48,7 +48,7 @@ module PT
       desc "#{action} [id]", "#{action} story"
       define_method(action.to_sym) do |story_id = nil|
         if story_id
-          if story = task_by_id_or_pt_id(story_id.to_i)
+          if story = @client.project.story(story_id.to_i)
             title("#{action} '#{story.name}'")
             send("#{action}_story", story)
           else
@@ -90,7 +90,7 @@ module PT
       desc "#{scope}", 'list all stories for #{scope} iteration'
       define_method(scope.to_sym) do
         select_story_from_paginated_table(title: "#{scope} iteration") do |page|
-          @client.get_stories_from_iteration(scope: scope)
+          @client.get_stories_from_iteration(scope: scope, page: page)
         end
       end
     end
