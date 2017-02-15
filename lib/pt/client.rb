@@ -1,4 +1,3 @@
-require 'pt/switch_ssl'
 require 'uri'
 require 'tracker_api'
 
@@ -27,33 +26,6 @@ module PT
 
     def project
       @client.project(Settings[:project_id])
-    end
-
-    def get_activities
-      project.activity
-    end
-
-    def get_work
-      project.stories(filter: 'state:unscheduled,unstarted,started', fields: STORY_FIELDS )
-    end
-
-    def get_my_work
-      project.stories(filter: "owner:#{Settings[:user_name]} -state:accepted", limit: 50, fields: STORY_FIELDS)
-    end
-
-    def search_for_story(query, params={})
-      params[:filter] =  "#{query}"
-      get_stories(params)
-    end
-
-    def get_task_by_id(id)
-      project.story(id, fields: STORY_FIELDS)
-    end
-    alias :get_story :get_task_by_id
-
-    def get_my_open_tasks(params={})
-      params[:filter] =  "owner:#{Settings[:user_name]}"
-      get_stories(params)
     end
 
     def get_stories_to_estimate(params={})
@@ -149,8 +121,7 @@ module PT
       task.save
     end
 
-    def comment_task(task, comment)
-      task = get_story(task.id)
+    def comment_task(story, comment)
       task.create_comment(text: comment)
     end
 
