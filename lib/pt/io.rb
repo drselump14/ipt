@@ -103,7 +103,7 @@ module PT
         clear
         say "Pivotal Tracker Command Line v#{PT::VERSION}".magenta
         say '========================================================================================='.green
-        help = "[num]: select | #{'[n]:next |' if current_page < total_page} #{'[p]:previous |' if current_page > 1} [c]:create | [r]:refresh | [q]: quit"
+        help = "[num]: select | [f]ilter | #{'[n]ext |' if current_page < total_page} #{'[p]revious |' if current_page > 1} [c]reate | [r]efresh | [q]uit"
         say help.green
         say '========================================================================================='.green
         case story = select(prompt, table)

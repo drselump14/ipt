@@ -228,9 +228,7 @@ module PT
 
       table = ActionTable.new([
         action_class.new('Complete', :complete),
-        # action_class.new('Delete', :delete),
         action_class.new('Edit', :edit)
-        # Move?
       ])
       action_to_execute = select('What to do with todo?', table)
 
@@ -240,9 +238,6 @@ module PT
       when :complete then
         task.complete = true
         congrats('Todo task completed!')
-        # when :delete then
-        #   task.delete
-        #   congrats('Todo task removed')
       when :edit then
         new_description = ask('New task description')
         task.description = new_description
