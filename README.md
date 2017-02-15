@@ -6,7 +6,7 @@
 Minimal client to use Pivotal Tracker API v5 from the command line
 
 # Demo
-[![asciicast](https://asciinema.org/a/bw6pt5x98cw35lajkliktx6iz.png)](https://asciinema.org/a/bw6pt5x98cw35lajkliktx6iz)
+![Demo](https://dl.dropboxusercontent.com/content_link/ATOAn3wOasdzVlpKW2XGTAG8xpVmr8B6CSwHdVDen3J4v5I9cUeYiESsOdYc5kal/file)
 
 ## Setup
 
@@ -20,7 +20,7 @@ Run `pt` from the root folder of your project will show all available command.
 
 ## Problems?
 
-[Open a new issue](https://github.com/raul/pt/issues/new). 
+[Open a new issue](https://github.com/raul/pt/issues/new).
 
 ## Contribute
 - `git clone https://github.com/raul/pt.git`
@@ -34,13 +34,6 @@ Run `pt` from the root folder of your project will show all available command.
 - Add test
 - Add edit story function
 - Use ncurse for better user interface
-
-# Contributors
-- [Slamet Kristanto](http://github.com/drselump14) (Current maintainer)
-- [orta therox](http://orta.github.com) (Current maintainer)
-- [Raul Murciano](http://raul.murciano.net) (Original author)
-- [Anthony Crumley](https://github.com/craftycode)
-- [Johan Andersson](http://johan.andersson.net)
 
 ## Thanks to...
 - the contributors of pt

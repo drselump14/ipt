@@ -88,13 +88,30 @@ module PT
     end
 
     def estimate_story(story)
-      estimation ||= ask("How many points you estimate for it? (#{project.point_scale})")
-      @client.estimate_story(story, estimation)
-      congrats("Task estimated, thanks!")
+      if story.story_type == 'feature'
+        estimation ||= ask("How many points you estimate for it? (#{project.point_scale})")
+        @client.estimate_story(story, estimation)
+        congrats("Task estimated, thanks!")
+      else
+        error('Only feature can be estimated!')
+      end
     end
 
     def start_story story
-      unless story.estimate
+      if story.story_type == 'feature' && !story.estimate
+        estimate_story(story)
+      end
+      @client.mark_task_as(story, 'started')
+      congrats("story started, go for it!")
+    end
+
+    def unstart_story story
+      @client.mark_task_as(story, 'unstarted')
+      congrats("story unstarted")
+    end
+
+    def start_story story
+      if story.story_type == 'feature' && !story.estimate
         estimate_story(story)
       end
       @client.mark_task_as(story, 'started')

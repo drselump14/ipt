@@ -153,7 +153,7 @@ module PT
         menu.choice(:deliver, nil,'deliver'.yellow) { deliver_story(story) }
         menu.choice(:accept, nil,'accept'.green) { accept_story(story) }
         menu.choice(:reject, nil,'reject'.red) { reject_story(story) }
-        %w[assign estimate tasks comment label open].each do |action|
+        %w[unstart assign estimate tasks comment label open].each do |action|
           menu.choice(action.to_sym) { send("#{action}_story", story) }
         end
         menu.choice('id (copy story id)') { copy_story_id(story)}
@@ -174,7 +174,7 @@ module PT
           end
         end
         menu.choice(:search) { find }
-        menu.choice(:back) { say('back to table ....'); return :no_request }
+        menu.choice(:cancel) { say('back to table ....'); return :no_request }
         menu.choice(:quit) { quit }
         menu.default = :back
       end

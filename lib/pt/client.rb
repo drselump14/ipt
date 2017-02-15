@@ -61,6 +61,11 @@ module PT
       get_stories(params)
     end
 
+    def get_stories_to_unstart(params={})
+      params[:filter] =  "owner:#{Settings[:user_name]} -state:unstarted"
+      get_stories(params)
+    end
+
     def get_stories_to_start(params={})
       params[:filter] =  "owner:#{Settings[:user_name]} type:feature,bug state:unscheduled,rejected,unstarted"
       tasks = get_stories(params)
