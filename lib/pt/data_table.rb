@@ -103,4 +103,10 @@ module PT
     end
   end
 
+  class LabelsTable < DataTable
+    def self.fields
+      [:name]
+    end
+  end
+
 end

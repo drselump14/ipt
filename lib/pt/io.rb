@@ -153,7 +153,7 @@ module PT
         menu.choice(:deliver, nil,'deliver'.yellow) { deliver_story(story) }
         menu.choice(:accept, nil,'accept'.green) { accept_story(story) }
         menu.choice(:reject, nil,'reject'.red) { reject_story(story) }
-        %w[unstart assign estimate tasks comment label open].each do |action|
+        %w[unstart assign estimate tasks comment add_label open].each do |action|
           menu.choice(action.to_sym) { send("#{action}_story", story) }
         end
         menu.choice('id (copy story id)') { copy_story_id(story)}
@@ -167,7 +167,7 @@ module PT
     def choose_filter
       HighLine.new.choose do |menu|
         menu.prompt = "Please choose filter ( [number/name]:select filter | [Enter]:back to table)".magenta
-        %w[current backlog mywork bug feature unstarted started finished delivered accepted rejected].each do |f|
+        %w[current backlog mywork label bug feature unstarted started finished delivered accepted rejected].each do |f|
           menu.choice(f.to_sym) do
             say 'filtering ' + f
             send(f.to_sym)

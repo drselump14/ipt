@@ -82,7 +82,7 @@ module PT
       end
     end
 
-    def label_story(story)
+    def add_label_story(story)
       label = ask("Which label?")
       @client.add_label(story, label );
       congrats("#{label} added, thanks!")

@@ -21,7 +21,7 @@ module PT
     attr_reader :project
 
     TYPE=%w[feature bug chore release]
-    ACTION = %w[show open start finish deliver accept reject done assign estimate tasks comment label edit unstart]
+    ACTION = %w[show open start finish deliver accept reject done assign estimate tasks comment add_label edit unstart]
 
     default_task :mywork
 
@@ -65,6 +65,14 @@ module PT
             end
           end
         end
+      end
+    end
+
+    desc "label <label>", "filter stories by label"
+    def label(_label=nil)
+      _label ||= select('Please select label', LabelsTable.new(@client.project.labels)).name
+      select_story_from_paginated_table(title: "stories with label:#{_label}") do |page|
+        @client.get_stories(filter: "label:#{_label}", page: page)
       end
     end
 
