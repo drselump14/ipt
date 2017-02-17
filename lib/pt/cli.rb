@@ -159,5 +159,10 @@ module PT
       end
       show_story(story)
     end
+
+    desc 'notifications', "show notifications"
+    def notifications
+      NotificationsTable.new(@client.notifications).print
+    end
   end
 end

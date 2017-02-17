@@ -97,10 +97,9 @@ module PT
     end
   end
 
-  class ActionTable < DataTable
-
+  class NotificationsTable < DataTable
     def self.fields
-      [:action]
+      [:message, :context]
     end
   end
 

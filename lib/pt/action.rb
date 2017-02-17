@@ -73,11 +73,12 @@ module PT
     def comment_story(story)
       say("Please write your comment")
       comment = edit_using_editor
-      if @client.comment_task(story, comment)
+      begin
+        @client.comment_task(story, comment)
         congrats("Comment sent, thanks!")
         save_recent_task( story.id )
-      else
-        error("Ummm, something went wrong.")
+      rescue
+        error("Ummm, something went wrong. Comment cancelled")
       end
     end
 
@@ -179,14 +180,14 @@ module PT
       end
 
       # set story type
-      type = case ask('Type? (c)hore, (b)ug, anything else for feature)')
-             when 'c', 'chore'
-               'chore'
-             when 'b', 'bug'
-               'bug'
-             else
-               'feature'
-             end
+      type = HighLine.new.choose do |menu|
+        menu.prompt = 'Please set type of story:'
+        menu.choice(:feature)
+        menu.choice(:bug)
+        menu.choice(:chore)
+        menu.choice(:release)
+        menu.default = :feature
+      end
 
       description = edit_using_editor if ask('Do you want to write description now?(y/n)') == 'y'
       story = @client.create_story(
@@ -196,7 +197,7 @@ module PT
         story_type: type,
         description: description
       )
-      congrats("#{type} #{('for' + owner.name ) if owner} has been created \n #{story.url}")
+      congrats("#{type} #{(' for ' + owner.name ) if owner} has been created \n #{story.url}")
       story
     end
 
@@ -251,15 +252,22 @@ module PT
       temp_path = "/tmp/editor-#{ Process.pid }.txt"
       File.write(temp_path, content) if content
       system "#{ editor } #{ temp_path }"
-      content = File.read(temp_path)
-      File.delete(temp_path)
-      content
+      begin
+        content = File.read(temp_path)
+        File.delete(temp_path)
+        content
+      rescue
+        ""
+      end
     end
 
     def choose_person
       members = @client.get_members
       table = PersonsTable.new(members.map(&:person))
       select("Please select a member to see his tasks.", table)
+    end
+
+    def open_story_from
     end
 
     def save_recent_task( task_id )
