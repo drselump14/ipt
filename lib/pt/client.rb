@@ -122,7 +122,7 @@ module PT
     end
 
     def comment_task(story, comment)
-      task.create_comment(text: comment)
+      story.create_comment(text: comment)
     end
 
     def create_story(args)
