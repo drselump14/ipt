@@ -7,7 +7,7 @@ Minimal client to use Pivotal Tracker API v5 from the command line.
 Interactive version of [pt](https://github.com/raul/pt)
 
 # Demo
-![gif](https://www.dropbox.com/s/whob1i5nocyk7hq/ipt.gif?raw=1)
+[![asciicast](https://asciinema.org/a/103161.png)](https://asciinema.org/a/103161)
 
 ## Setup
 
