@@ -1,0 +1,41 @@
+name: Ruby
+
+on: [push]
+
+env:
+  RAILS_ENV: test
+jobs:
+  build:
+    if: true
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Ruby 2.6
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.6.x
+      - name: cache gems
+        id: cache-gems
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}--${{ hashFiles('Gemfile.lock') }}
+      - name: bundle install
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3 --path=vendor/bundle --without production
+      - name: run rspec
+        run: |
+          bundle exec rspec \
+                --format progress \
+                --tag ~slow \
+                --profile \
+                -- spec/
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: tmp/test/code-coverage.html
+

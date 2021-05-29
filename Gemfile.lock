@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ipt (2.0.0)
+    ipt (2.1.0)
       anyway_config
       config
       paint
@@ -200,7 +200,7 @@ GEM
       method_source (~> 1.0)
     public_suffix (4.0.6)
     rainbow (3.0.0)
-    rake (10.5.0)
+    rake (13.0.3)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
@@ -303,12 +303,12 @@ PLATFORMS
 
 DEPENDENCIES
   aruba (~> 0.14.2)
-  bundler (~> 2.2)
+  bundler (>= 2.2.10)
   guard
   guard-rspec
   ipt!
   pry
-  rake (~> 10.0)
+  rake (>= 12.3.3)
   rspec
   sorbet
   tapioca
