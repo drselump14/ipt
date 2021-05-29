@@ -1,3 +1,4 @@
+# typed: strict
 require 'tracker_api'
 require "zeitwerk"
 

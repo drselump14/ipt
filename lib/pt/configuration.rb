@@ -1,3 +1,4 @@
+# typed: false
 require 'config'
 module PT
   class Configuration

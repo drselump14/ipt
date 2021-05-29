@@ -1,4 +1,7 @@
-require 'highline'
+# typed: false
+# frozen_string_literal: true
+
+require "tty-prompt"
 module PT
   module IO
 
@@ -34,12 +37,16 @@ module PT
       exit
     end
 
+    def prompt
+      @prompt ||= TTY::Prompt.new
+    end
+
     def ask(msg)
-      HighLine.new.ask(msg)
+      prompt.ask(msg)
     end
 
     def ask_secret(msg)
-      HighLine.new.ask("#{msg.bold}"){ |q| q.echo = '*' }
+      prompt.mask(msg)
     end
 
     def user_s

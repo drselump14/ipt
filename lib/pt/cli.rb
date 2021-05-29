@@ -1,3 +1,4 @@
+# typed: false
 require 'yaml'
 require 'highline'
 require 'tempfile'

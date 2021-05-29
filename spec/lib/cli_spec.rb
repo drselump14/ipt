@@ -1,3 +1,4 @@
+# typed: false
 require 'spec_helper'
 
 RSpec.shared_context "cli filter" do

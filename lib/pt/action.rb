@@ -1,3 +1,4 @@
+# typed: false
 module PT
   module Action
     def show_story(story)
