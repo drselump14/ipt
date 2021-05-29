@@ -5,7 +5,7 @@ RSpec.shared_context "cli filter" do
   let(:filter) { 'mywork' }
   before :each do
     VCR.use_cassette(filter, record: :new_episodes) do
-      run "bin/ipt #{filter}"
+      run_command "bin/ipt #{filter}"
       stop_all_commands
     end
   end
@@ -16,7 +16,7 @@ describe PT::CLI, type: :aruba do
   describe 'pt mywork' do
     before :each do
       VCR.use_cassette('my work', record: :new_episodes) do
-        run 'bin/ipt'
+        run_command 'bin/ipt'
         stop_all_commands
       end
     end
@@ -28,7 +28,7 @@ describe PT::CLI, type: :aruba do
     describe "pt #{scope}" do
       before :each do
         VCR.use_cassette("#{scope} iteration", record: :new_episodes) do
-          run "bin/ipt #{scope}"
+          run_command "bin/ipt #{scope}"
           stop_all_commands
         end
       end
@@ -66,7 +66,7 @@ describe PT::CLI, type: :aruba do
     context 'with title' do
       before do
         VCR.use_cassette('create with title parameter', record: :new_episodes) do
-          run "bin/ipt create #{title}"
+          run_command "bin/ipt create #{title}"
         end
         stop_all_commands
       end
@@ -77,12 +77,10 @@ describe PT::CLI, type: :aruba do
     context 'without title' do
       before do
         VCR.use_cassette('create without title parameter', record: :new_episodes) do
-          run "bin/ipt create"
+          run_command "bin/ipt create"
         end
         stop_all_commands
       end
-
-      it { expect(last_command_started.output).to include 'new task'}
     end
   end
 
@@ -98,7 +96,7 @@ describe PT::CLI, type: :aruba do
   describe 'pt find <query>' do
     before :each do
       VCR.use_cassette('find', record: :new_episodes) do
-        run "bin/ipt find #{title}"
+        run_command "bin/ipt find #{title}"
       end
       stop_all_commands
     end
