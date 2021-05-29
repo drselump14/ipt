@@ -1,6 +1,24 @@
 # typed: false
+
+require "tty-editor"
+require "tty-prompt"
+
 module PT
   module Action
+    def prompt
+      @prompt ||= TTY::Prompt
+        .new
+        .on(:keypress) do |event|
+          if event.value == "j"
+            prompt.trigger(:keydown)
+          end
+
+          if event.value == "k"
+            prompt.trigger(:keyup)
+          end
+        end
+    end
+
     def show_story(story)
       clear
       title('========================================='.red)
@@ -172,33 +190,39 @@ module PT
       # set title
       title = ask("Name for the new task:")
 
+      owners = []
       # set owner
-      if ask('Do you want to assign it now? (y/n)').downcase == 'y'
+      if prompt.yes?('Do you want to assign it now? (y/n)')
         members = @client.get_members
-        table = PersonsTable.new(members.map(&:person))
-        owner = select("Please select a member to assign him the task.", table)
-        owner_id = owner.id
+        member_choices = members.map(&:person).map do |p|
+          {
+            name: "[#{p.initials}] #{p.name}",
+            value: p
+          }
+        end
+        owners = prompt.multi_select("Select member?", member_choices, min: 1)
       end
 
       # set story type
-      type = HighLine.new.choose do |menu|
-        menu.prompt = 'Please set type of story:'
-        menu.choice(:feature)
-        menu.choice(:bug)
-        menu.choice(:chore)
-        menu.choice(:release)
-        menu.default = :feature
+      type = prompt.select("Please set type of story:") do |menu|
+        menu.enum "."
+        menu.choice("feature")
+        menu.choice("bug")
+        menu.choice("chore")
+        menu.choice("release")
+        menu.default("feature")
       end
 
-      description = edit_using_editor if ask('Do you want to write description now?(y/n)') == 'y'
-      story = @client.create_story(
+      description = edit_using_editor if prompt.yes?('Do you want to write description now?(y/n)')
+      story_args = {
         name: title,
-        owner_ids: [owner_id],
+        owner_ids: owners.map(&:id),
         requested_by_id: Settings[:user_id],
         story_type: type,
         description: description
-      )
-      congrats("#{type} #{(' for ' + owner.name ) if owner} has been created \n #{story.url}")
+      }
+      story = @client.create_story(story_args)
+      congrats("#{type.capitalize} has been created \n #{story.url}")
       story
     end
 
@@ -251,15 +275,8 @@ module PT
     def edit_using_editor(content=nil)
       editor = ENV.fetch('EDITOR') { 'vi' }
       temp_path = "/tmp/editor-#{ Process.pid }.txt"
+      TTY::Editor.open(temp_path, text: content)
       File.write(temp_path, content) if content
-      system "#{ editor } #{ temp_path }"
-      begin
-        content = File.read(temp_path)
-        File.delete(temp_path)
-        content
-      rescue
-        ""
-      end
     end
 
     def choose_person

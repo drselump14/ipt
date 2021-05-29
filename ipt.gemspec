@@ -29,10 +29,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'sorbet'
   spec.add_development_dependency 'tapioca'
 
-  spec.add_dependency 'tracker_api', '~> 1.13.0'
+  spec.add_dependency 'tracker_api'
   spec.add_dependency 'thor'
   spec.add_dependency 'tty-prompt'
-  spec.add_dependency 'tty-color'
+  spec.add_dependency 'tty-editor'
+  spec.add_dependency 'tty-markdown'
   spec.add_dependency 'terminal-table'
   spec.add_dependency 'paint'
   spec.add_dependency 'anyway_config'
