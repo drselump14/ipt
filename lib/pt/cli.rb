@@ -28,7 +28,6 @@ module PT
 
     def initialize(*args)
       super
-      @io = HighLine.new
       @config = PT::Configuration.new
       @client = @config.client || Client.new
       @project = @client.project
