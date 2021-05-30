@@ -20,17 +20,24 @@ Gem::Specification.new do |spec|
 
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.13"
-  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "bundler", ">= 2.2.10"
+  spec.add_development_dependency "rake", ">= 12.3.3"
   spec.add_development_dependency "pry"
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'aruba'
   spec.add_development_dependency 'vcr'
+  spec.add_development_dependency 'sorbet'
+  spec.add_development_dependency 'tapioca'
 
-  spec.add_dependency    'highline', '>= 2.0.0.pre.develop.6'
-  spec.add_dependency    'tracker_api', '~> 1.6.0'
-  spec.add_dependency    'thor'
-  spec.add_dependency    'terminal-table'
-  spec.add_dependency    'paint'
-  spec.add_dependency    'config'
+  spec.add_dependency 'tracker_api'
+  spec.add_dependency 'thor'
+  spec.add_dependency 'tty-prompt'
+  spec.add_dependency 'tty-editor'
+  spec.add_dependency 'tty-markdown'
+  spec.add_dependency 'terminal-table'
+  spec.add_dependency 'paint'
+  spec.add_dependency 'anyway_config'
+  spec.add_dependency 'config'
+  spec.add_dependency 'zeitwerk'
+  spec.add_dependency "sorbet-runtime"
 end

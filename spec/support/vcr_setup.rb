@@ -1,3 +1,4 @@
+# typed: strict
 require 'aruba/rspec'
 require 'vcr'
 require 'faraday'

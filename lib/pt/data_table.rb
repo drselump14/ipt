@@ -1,3 +1,4 @@
+# typed: true
 # require 'hirb'
 # require 'hirb-unicode'
 require 'terminal-table'
@@ -5,8 +6,6 @@ require 'terminal-table'
 module PT
 
   class DataTable
-
-    # extend ::Hirb::Console
 
     def initialize(dataset, title=nil)
       @title = title

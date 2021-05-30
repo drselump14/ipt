@@ -1,8 +1,9 @@
+# typed: false
 require 'uri'
 require 'tracker_api'
 
 module PT
-  class Client < SimpleDelegator
+  class Client
 
     STORY_FIELDS=':default,requested_by(initials),owners(initials),tasks(complete,description),comments(text,file_attachment_ids,person(initials))'
 
@@ -10,7 +11,6 @@ module PT
 
     def initialize
       @client = TrackerApi::Client.new(token: Settings[:pivotal_api_key])
-      self.__setobj__(@client)
       @limit = Settings[:limit] || 10
     end
 
@@ -128,6 +128,5 @@ module PT
     def create_story(args)
       project.create_story(args)
     end
-
   end
 end
