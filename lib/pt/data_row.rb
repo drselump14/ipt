@@ -1,3 +1,4 @@
+# typed: false
 require 'iconv' unless "older_ruby?".respond_to?(:force_encoding)
 
 module PT

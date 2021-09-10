@@ -1,4 +1,9 @@
-require 'highline'
+# typed: false
+# frozen_string_literal: true
+
+require "tty-prompt"
+require "tty-markdown"
+
 module PT
   module IO
 
@@ -22,7 +27,7 @@ module PT
     end
 
     def compact_message(*msg)
-      puts "#{split_lines(msg)}"
+      TTY::Markdown.parse "#{split_lines(msg)}"
     end
 
     def error(*msg)
@@ -34,12 +39,16 @@ module PT
       exit
     end
 
+    def prompt
+      @prompt ||= TTY::Prompt.new
+    end
+
     def ask(msg)
-      HighLine.new.ask(msg)
+      prompt.ask(msg)
     end
 
     def ask_secret(msg)
-      HighLine.new.ask("#{msg.bold}"){ |q| q.echo = '*' }
+      prompt.mask(msg)
     end
 
     def user_s
@@ -90,7 +99,7 @@ module PT
     end
 
     def select_story_from_paginated_table(options={}, &block)
-      prompt = "Please select a story"
+      prompt_message = "Please select a story"
       page = 0
       no_request = false
       begin
@@ -101,12 +110,12 @@ module PT
         title = (options[:title] || 'Stories').to_s + " [#{current_page}/#{total_page}]"
         table = TasksTable.new(stories, title)
         clear
-        say "Pivotal Tracker Command Line v#{PT::VERSION}".magenta
+        prompt.say "Pivotal Tracker Command Line v#{PT::VERSION}".magenta
         say '========================================================================================='.green
         help = "[num]: select | [f]ilter | #{'[n]ext |' if current_page < total_page} #{'[p]revious |' if current_page > 1} [c]reate | [r]efresh | [q]uit"
         say help.green
         say '========================================================================================='.green
-        case story = select(prompt, table)
+        case story = select(prompt_message, table)
         when TrackerApi::Resources::Story
           say "Action for >> '#{story.name.green}'[#{story.story_type}]"
           action = (options[:default_action] ? send("#{options[:default_action]}_story", story) : choose_action(story))

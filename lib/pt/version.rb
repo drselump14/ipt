@@ -1,3 +1,4 @@
+# typed: strict
 module PT
-  VERSION = '1.0.1'
+  VERSION = '2.1.0'
 end
